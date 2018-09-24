@@ -13,7 +13,7 @@ class CreateDeviceTable extends Migration
      */
     public function up()
     {
-        Schema::create('device', function (Blueprint $table) {
+        Schema::create('devices', function (Blueprint $table) {
             $table->collation = 'utf8_general_ci';
             $table->string('serial_number','255')->unique()->primary();
             $table->timestamp('created_at')->useCurrent();
@@ -29,6 +29,6 @@ class CreateDeviceTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('device');
+        Schema::dropIfExists('devices');
     }
 }
