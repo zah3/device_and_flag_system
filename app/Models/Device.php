@@ -17,24 +17,33 @@ class Device extends Model
     ];
 
     protected $primaryKey = 'serial_number';
-    public function appendFlagToList(Flag $nextFlag){
-        var_dump(json_decode($this->flag_list),$this->isJson($this->flag_list));die(1);
-        if($this->isJson($this->flag_list)){
-            $currentFlagList = json_decode($this->flag_list);
-            $currentFlagList[] = $nextFlag;
-            $this->flag_list = json_encode($currentFlagList);
-        }else{
-            $array[] = $nextFlag;
-            $this->flag_list = json_encode($array);
-        }
+
+    /**
+     * @param Flag $nextFlag
+     */
+    public function appendFlagToList(Flag $nextFlag) : void{
+        $flagList = $this->getFlagListOfModel();
+        $flagList[] = $nextFlag;
+        $this->flag_list = json_encode($flagList);
         $this->save();
     }
-    public function getFlagList(){
-        return $this->flag_list;
-    }
 
-    function isJson($string) {
+    /**
+     * check if string is a json
+     * @param $string
+     * @return bool
+     */
+    function isJson(string $string) : bool{
         json_decode($string);
         return (json_last_error() == JSON_ERROR_NONE);
+    }
+
+    public function getFlagListOfModel(){
+        return ($this->isJson($this->flag_list)) ? json_decode($this->flag_list) : [];
+    }
+
+    function getPossibleNextFlag(){
+        $flagList = $this->getFlagListOfModel();
+
     }
 }
