@@ -9,6 +9,8 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Flag;
+use Illuminate\Http\Request;
 
 /**
  * Class SystemController
@@ -16,8 +18,24 @@ use App\Http\Controllers\Controller;
  */
 class SystemController extends Controller{
 
-    public function scan(string $serialNumber, string$flagName){
-        return response(['']);
+    private $validateScanRequestRules = [];
+
+    public function __construct(){
+        $this->validateScanRequestRules = [
+            'serial_number' => 'required|max:255',
+            'flag_name' => 'required|in:'.implode(',',Flag::AVAILABLE_FLAG_NAMES),
+        ];
+    }
+
+    /**
+     * @param Request $request
+     * @param  [string] serial_number
+     * @param  [string] flag_name
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function scan(Request $request){
+        $this->validate($request,$this->validateScanRequestRules);
+        return response()->json(['message'=>'ok','request' => $request->all()],400);
     }
 
 }
