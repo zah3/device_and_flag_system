@@ -9,6 +9,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Device;
 use App\Models\Flag;
 use Illuminate\Http\Request;
 
@@ -35,7 +36,10 @@ class SystemController extends Controller{
      */
     public function scan(Request $request){
         $this->validate($request,$this->validateScanRequestRules);
-        return response()->json(['message'=>'ok','request' => $request->all()],400);
+        $model = Device::firstOrCreate(['serial_number' => $request->serial_number],['serial_number' => $request->serial_number]);
+        $flag = new Flag($request);
+        $model->appendFlagToList($flag);
+        return response()->json(['message'=>'ok','request' => $request->all(),'model' => $model,'flag' => $flag],400);
     }
 
 }

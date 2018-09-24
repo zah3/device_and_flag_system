@@ -18,7 +18,7 @@ class CreateDeviceTable extends Migration
             $table->string('serial_number','255')->unique()->primary();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->default(\Illuminate\Support\Facades\DB::raw('NULL on update CURRENT_TIMESTAMP'))->nullable();
-            $table->text('flag_list');
+            $table->text('flag_list')->nullable();
         });
     }
 
