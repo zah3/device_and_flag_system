@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Device extends Model
 {
+
     protected $dates = [
         'created_at',
         'updated_at'
@@ -17,6 +18,8 @@ class Device extends Model
     ];
 
     protected $primaryKey = 'serial_number';
+
+    public $incrementing = false;
 
     /**
      * @param Flag $nextFlag

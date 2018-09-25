@@ -41,7 +41,7 @@ class SystemController extends Controller{
         if(!$device && $request->flag_name === Flag::FLAG_NAME_UNPACKING){
             $device = new Device(['serial_number' => $request->serial_number]);
         }else if((!$device && $request->flag_name !== Flag::FLAG_NAME_UNPACKING) ||
-            ($device && $request->flag_name !== Flag::FLAG_NAME_UNPACKING && $device->flag_name == NULL)){
+            ($device && $request->flag_name !== Flag::FLAG_NAME_UNPACKING && $device->flag_list == NULL)){
             return response()->json(['message'=>'error','error' => 'Device should start his journey in ' . Flag::FLAG_NAME_UNPACKING],400);
         }
         //$device = Device::firstOrCreate(['serial_number' => $request->serial_number],['serial_number' => $request->serial_number]);
@@ -55,7 +55,7 @@ class SystemController extends Controller{
         }
         DB::commit();
         $device->save();
-        return response()->json(['message'=>'ok','request' => $request->all(),'device' => $device,'flag' => $flag],200);
+        return response()->json(['message'=>'ok','Device' => $request->all()],200);
     }
 
 }
