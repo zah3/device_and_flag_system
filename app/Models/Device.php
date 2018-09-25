@@ -80,11 +80,13 @@ class Device extends Model
      */
     public function validateFlow($wantedFlagToAdd){
         $possibleNextFlags = $this->getPossibleNextFlag();
+        $flagList = $this->getFlagListOfModel();
+        $lastFlagFromTheList = end($flagList);
         if(!count($possibleNextFlags)){
             throw new \Exception('Sorry, but this device has made 1 circle in flow.');
         }
         if(!in_array($wantedFlagToAdd->name,$possibleNextFlags)){
-           throw new \Exception('Sorry, if device last flag is: '. $wantedFlagToAdd->name.', next could be: '.implode(', ',$possibleNextFlags).'.');
+           throw new \Exception('Sorry, if device last flag is: '. $lastFlagFromTheList->name . ', next could be: ' . implode(', ',$possibleNextFlags).'.');
         }
     }
 }

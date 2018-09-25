@@ -55,7 +55,7 @@ class SystemController extends Controller{
         }
         DB::commit();
         $device->save();
-        return response()->json(['message'=>'ok','Device' => $request->all()],200);
+        return response()->json(['message'=>'ok','Device' => $device,],200);
     }
 
 }
