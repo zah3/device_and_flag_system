@@ -12,6 +12,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Device;
 use App\Models\Flag;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class SystemController
@@ -37,9 +38,17 @@ class SystemController extends Controller{
     public function scan(Request $request){
         $this->validate($request,$this->validateScanRequestRules);
         $model = Device::firstOrCreate(['serial_number' => $request->serial_number],['serial_number' => $request->serial_number]);
-        $flag = new Flag($request);
-        $model->appendFlagToList($flag);
-        return response()->json(['message'=>'ok','request' => $request->all(),'model' => $model,'flag' => $flag],400);
+        try{
+            DB::beginTransaction();
+            $flag = new Flag($request);
+            $model->appendFlagToList($flag);
+        }catch(\Exception | \Throwable $error){
+            DB::rollBack();
+            return response()->json(['message'=>'error','error' => $error->getMessage()],400);
+        }
+        DB::commit();
+        $model->save();
+        return response()->json(['message'=>'ok','request' => $request->all(),'model' => $model,'flag' => $flag],200);
     }
 
 }

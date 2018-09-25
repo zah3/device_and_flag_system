@@ -22,10 +22,10 @@ class Device extends Model
      * @param Flag $nextFlag
      */
     public function appendFlagToList(Flag $nextFlag) : void{
+        $this->validateFlow($nextFlag);
         $flagList = $this->getFlagListOfModel();
         $flagList[] = $nextFlag;
         $this->flag_list = json_encode($flagList);
-        $this->save();
     }
 
     /**
@@ -33,17 +33,50 @@ class Device extends Model
      * @param $string
      * @return bool
      */
-    function isJson(string $string) : bool{
+    public function isJson(?string $string) : bool{
         json_decode($string);
         return (json_last_error() == JSON_ERROR_NONE);
     }
 
+    /**
+     * @return array|mixed
+     */
     public function getFlagListOfModel(){
         return ($this->isJson($this->flag_list)) ? json_decode($this->flag_list) : [];
     }
 
-    function getPossibleNextFlag(){
+    /**
+     * @return array
+     */
+    private function getPossibleNextFlag() : array {
         $flagList = $this->getFlagListOfModel();
+        if(count($flagList)){
+            $lastFlagFromTheList = end($flagList);
+            if($lastFlagFromTheList->name === Flag::FLAG_NAME_UNPACKING){
+                return [Flag::FLAG_NAME_TESTING_BROKEN, Flag::FLAG_NAME_TESTING_EFFICIENT];
+            }elseif($lastFlagFromTheList->name === Flag::FLAG_NAME_TESTING_BROKEN){
+                return [Flag::FLAG_NAME_PACKING_BROKEN];
+            }elseif($lastFlagFromTheList->name === Flag::FLAG_NAME_TESTING_EFFICIENT){
+                return [Flag::FLAG_NAME_CLEANING,FLAG::FLAG_NAME_HOUSING_REPLACEMENT];
+            }elseif($lastFlagFromTheList->name === Flag::FLAG_NAME_CLEANING ||
+                    $lastFlagFromTheList->name === Flag::FLAG_NAME_HOUSING_REPLACEMENT ){
+                return [Flag::FLAG_NAME_PACKING];
+            }elseif($lastFlagFromTheList->name === Flag::FLAG_NAME_PACKING){
+                return [];
+            }
+        }else{
+            return [Flag::FLAG_NAME_UNPACKING];
+        }
+    }
 
+    /**
+     * @param $wantedFlagToAdd
+     * @throws \Exception
+     */
+    public function validateFlow($wantedFlagToAdd){
+        $possibleNextFlags = $this->getPossibleNextFlag();
+        if(!in_array($wantedFlagToAdd->name,$possibleNextFlags)){
+           throw new \Exception('Sorry, if Your last flag is: '. $wantedFlagToAdd->name.', next could be: '.implode(', ',$possibleNextFlags).'.');
+        }
     }
 }
