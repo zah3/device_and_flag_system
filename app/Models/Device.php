@@ -56,13 +56,15 @@ class Device extends Model
                 return [Flag::FLAG_NAME_TESTING_BROKEN, Flag::FLAG_NAME_TESTING_EFFICIENT];
             }elseif($lastFlagFromTheList->name === Flag::FLAG_NAME_TESTING_BROKEN){
                 return [Flag::FLAG_NAME_PACKING_BROKEN];
+            }elseif($lastFlagFromTheList->name === Flag::FLAG_NAME_PACKING_BROKEN){
+                return []; // as a last item in flow cannot have next flag
             }elseif($lastFlagFromTheList->name === Flag::FLAG_NAME_TESTING_EFFICIENT){
                 return [Flag::FLAG_NAME_CLEANING,FLAG::FLAG_NAME_HOUSING_REPLACEMENT];
             }elseif($lastFlagFromTheList->name === Flag::FLAG_NAME_CLEANING ||
                     $lastFlagFromTheList->name === Flag::FLAG_NAME_HOUSING_REPLACEMENT ){
                 return [Flag::FLAG_NAME_PACKING];
             }elseif($lastFlagFromTheList->name === Flag::FLAG_NAME_PACKING){
-                return [];
+                return [];// as a last item in flow cannot have next flag
             }
         }else{
             return [Flag::FLAG_NAME_UNPACKING];
@@ -75,6 +77,9 @@ class Device extends Model
      */
     public function validateFlow($wantedFlagToAdd){
         $possibleNextFlags = $this->getPossibleNextFlag();
+        if(!count($possibleNextFlags)){
+            throw new \Exception('Sorry, but this device has made 1 circle in flow.');
+        }
         if(!in_array($wantedFlagToAdd->name,$possibleNextFlags)){
            throw new \Exception('Sorry, if Your last flag is: '. $wantedFlagToAdd->name.', next could be: '.implode(', ',$possibleNextFlags).'.');
         }

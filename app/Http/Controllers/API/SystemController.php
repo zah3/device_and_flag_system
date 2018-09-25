@@ -37,18 +37,25 @@ class SystemController extends Controller{
      */
     public function scan(Request $request){
         $this->validate($request,$this->validateScanRequestRules);
-        $model = Device::firstOrCreate(['serial_number' => $request->serial_number],['serial_number' => $request->serial_number]);
+        $device =  Device::find($request->serial_number);
+        if(!$device && $request->flag_name === Flag::FLAG_NAME_UNPACKING){
+            $device = new Device(['serial_number' => $request->serial_number]);
+        }else if((!$device && $request->flag_name !== Flag::FLAG_NAME_UNPACKING) ||
+            ($device && $request->flag_name !== Flag::FLAG_NAME_UNPACKING && $device->flag_name == NULL)){
+            return response()->json(['message'=>'error','error' => 'Device should start his journey in ' . Flag::FLAG_NAME_UNPACKING],400);
+        }
+        //$device = Device::firstOrCreate(['serial_number' => $request->serial_number],['serial_number' => $request->serial_number]);
         try{
             DB::beginTransaction();
             $flag = new Flag($request);
-            $model->appendFlagToList($flag);
+            $device->appendFlagToList($flag);
         }catch(\Exception | \Throwable $error){
             DB::rollBack();
             return response()->json(['message'=>'error','error' => $error->getMessage()],400);
         }
         DB::commit();
-        $model->save();
-        return response()->json(['message'=>'ok','request' => $request->all(),'model' => $model,'flag' => $flag],200);
+        $device->save();
+        return response()->json(['message'=>'ok','request' => $request->all(),'device' => $device,'flag' => $flag],200);
     }
 
 }
