@@ -84,7 +84,7 @@ class Device extends Model
             throw new \Exception('Sorry, but this device has made 1 circle in flow.');
         }
         if(!in_array($wantedFlagToAdd->name,$possibleNextFlags)){
-           throw new \Exception('Sorry, if Your last flag is: '. $wantedFlagToAdd->name.', next could be: '.implode(', ',$possibleNextFlags).'.');
+           throw new \Exception('Sorry, if device last flag is: '. $wantedFlagToAdd->name.', next could be: '.implode(', ',$possibleNextFlags).'.');
         }
     }
 }
